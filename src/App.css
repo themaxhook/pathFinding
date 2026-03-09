@@ -1,0 +1,225 @@
+/* GLOBAL RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden; /* prevent scrolling in both directions */
+}
+
+body {
+  margin: 0;
+}
+
+/* FULL SCREEN APP */
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+
+/* ===== NAVBAR ===== */
+.top-box {
+  width: 100%;
+  background-color: #2C3E50;
+  color: white;
+  padding: 20px 40px;
+
+  display: flex;
+  align-items: center;
+}
+
+/* 25% Title */
+.logo {
+  width: 25%;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* 50% Controls */
+.controls {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 25% Status */
+.status {
+  width: 25%;
+  text-align: right;
+  font-size: 14px;
+}
+
+/* Vertical Divider */
+.nav-divider {
+  width: 1px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.4);
+  margin: 0 15px;
+}
+
+/* Control grouping */
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.algo-label {
+  font-weight: 500;
+}
+
+/* Buttons */
+button {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primary-btn {
+  background-color: #3b82f6;
+  color: white;
+}
+
+button:not(.primary-btn) {
+  background-color: #ecf0f1;
+  color: black;
+}
+
+select,
+input[type="range"] {
+  padding: 6px;
+}
+
+select:disabled,
+input[type="range"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== CONTENT ===== */
+.content {
+  flex: 1;              /* takes remaining height */
+  width: 95%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Legend Title */
+.legend-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 20px 0 10px 0;
+}
+
+/* Legend */
+.legend-box {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+/* Divider */
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: #d1d5db;
+  margin: 15px 0;
+}
+
+/* GRID AREA TAKES REST SPACE */
+.grid-box {
+  flex: 1;
+  display: flex;
+  overflow: hidden; /* hide any overflow so no scrollbars appear */
+  padding: 20px;   /* a bit more space so cells are slightly smaller */
+}
+
+.grid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  /* 40 columns for a 20 x 40 grid */
+  grid-template-columns: repeat(40, 1fr);
+}
+
+.node {
+  border: 1px solid #b0b0b0;  /* thinner grid lines */
+  aspect-ratio: 1 / 1;   /* This makes each cell a perfect square */
+  background-color: white;
+  transition: background-color 0.15s;
+}
+
+/* Different colors for each node state */
+.node-start {
+  background-color: #22c55e; /* green */
+}
+
+.node-end {
+  background-color: #ef4444; /* red */
+}
+
+.node-wall {
+  background-color: #111827; /* almost black */
+}
+
+.node-visited {
+  background-color: #3b82f6; /* blue */
+}
+
+.node-path {
+  background-color: #facc15; /* yellow */
+}
+
+/* Legend colors */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  border: 1px solid #d1d5db;
+}
+
+.legend-color.unvisited {
+  background-color: white;
+}
+
+.legend-color.visited {
+  background-color: #3b82f6;
+}
+
+.legend-color.path {
+  background-color: #facc15;
+}
+
+.legend-color.wall {
+  background-color: #111827;
+}
+
+.legend-color.start {
+  background-color: #22c55e;
+}
+
+.legend-color.end {
+  background-color: #ef4444;
+}
