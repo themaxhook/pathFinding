@@ -86,7 +86,7 @@ function App() {
     if (node.isStart || node.isEnd) {
       setStatusText("Start and End cannot be walls");
       return;
-    }
+    }//
 
     if (isWeightMode) {
       // If a node already has a weight > 1, we reset it
@@ -177,7 +177,7 @@ function App() {
     // Higher slider value = faster animation (smaller delay).
     const delay = 110 - speed;
 
-    const animateStep = (step: AnimationStep) => {
+    const animateStep = (step: AnimationStep) => {//blue ya yellow kr raha hai ye
       setGrid((prevGrid) => {
         const newGrid = [...prevGrid];
         const rowArray = [...newGrid[step.row]];
@@ -209,7 +209,7 @@ function App() {
     setTimeout(() => {
       setIsAnimating(false);
       setStatusText("Finished");
-    }, steps.length * delay);
+    }, steps.length * delay);//we set all this to present Finished  after execution
   };
 
   return (
