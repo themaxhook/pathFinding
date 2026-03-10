@@ -1,4 +1,4 @@
-import type { GridNode, Position } from "../types/grid";
+import type { GridNode, Position, AnimationStep } from "../types/grid";
 import { runBfs } from "./bfs";
 import { runDfs } from "./dfs";
 import { runDijkstra } from "./dijkstra";
@@ -13,7 +13,7 @@ export function runAlgorithm(
   grid: GridNode[][],
   start: Position,
   end: Position
-) {
+): AnimationStep[] {
   if (name === "BFS") return runBfs(grid, start, end);
   if (name === "DFS") return runDfs(grid, start, end);
   if (name === "Dijkstra") return runDijkstra(grid, start, end);

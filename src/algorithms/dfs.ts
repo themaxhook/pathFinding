@@ -1,12 +1,12 @@
-import type { GridNode, Position } from "../types/grid";
+import type { GridNode, Position, AnimationStep } from "../types/grid";
 
-// Simple Depth-First Search (DFS).
-// Explores as far as possible along each branch before backtracking.
+// DFS algorithm
+// goes as deep as possible before backtracking
 export function runDfs(
   grid: GridNode[][],
   start: Position,
   end: Position
-): { visitedOrder: Position[]; path: Position[] } {
+): AnimationStep[] {
   const rows = grid.length;
   const cols = grid[0].length;
 
@@ -18,7 +18,7 @@ export function runDfs(
     Array(cols).fill(null)
   );
 
-  const visitedOrder: Position[] = [];
+  const steps: AnimationStep[] = [];
 
   const directions: Position[] = [
     { row: -1, col: 0 },
@@ -27,23 +27,25 @@ export function runDfs(
     { row: 0, col: 1 },
   ];
 
-  // Return true if we reached the end, so we can stop exploring early
   function dfs(current: Position): boolean {
     if (visited[current.row][current.col]) return false;
+
+    // mark node as visited
     visited[current.row][current.col] = true;
-    visitedOrder.push(current);
+    steps.push({ type: "visit", row: current.row, col: current.col });
 
     if (current.row === end.row && current.col === end.col) {
-      return true;
+      return true; // found it, stop searching
     }
 
+    // checking neighbors
     for (const dir of directions) {
       const newRow = current.row + dir.row;
       const newCol = current.col + dir.col;
 
       if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) continue;
-      if (grid[newRow][newCol].isWall) continue;
-      if (visited[newRow][newCol]) continue;
+      if (grid[newRow][newCol].isWall) continue; // skip walls
+      if (visited[newRow][newCol]) continue; // skip visited
 
       prev[newRow][newCol] = current;
       const found = dfs({ row: newRow, col: newCol });
@@ -57,6 +59,9 @@ export function runDfs(
 
   dfs(start);
 
+  if (prev[end.row][end.col] === null) return steps;
+
+  // backtracking to build final path
   const path: Position[] = [];
   let current: Position | null = end;
 
@@ -72,6 +77,10 @@ export function runDfs(
 
   path.reverse();
 
-  return { visitedOrder, path };
+  for (const pos of path) {
+    steps.push({ type: "path", row: pos.row, col: pos.col });
+  }
+
+  return steps;
 }
 

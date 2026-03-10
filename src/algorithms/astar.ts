@@ -1,4 +1,4 @@
-import type { GridNode, Position } from "../types/grid";
+import type { GridNode, Position, AnimationStep } from "../types/grid";
 
 // Manhattan distance heuristic for A* (works well on grids)
 function manhattan(a: Position, b: Position): number {
@@ -11,13 +11,15 @@ export function runAStar(
   grid: GridNode[][],
   start: Position,
   end: Position
-): { visitedOrder: Position[]; path: Position[] } {
+): AnimationStep[] {
   const rows = grid.length;
   const cols = grid[0].length;
 
+  // cost from start to current node
   const gScore: number[][] = Array.from({ length: rows }, () =>
     Array(cols).fill(Infinity)
   );
+  // estimated total cost from start to end
   const fScore: number[][] = Array.from({ length: rows }, () =>
     Array(cols).fill(Infinity)
   );
@@ -29,7 +31,7 @@ export function runAStar(
   );
 
   const openSet: Position[] = [];
-  const visitedOrder: Position[] = [];
+  const steps: AnimationStep[] = [];
 
   gScore[start.row][start.col] = 0;
   fScore[start.row][start.col] = manhattan(start, end);
@@ -43,36 +45,39 @@ export function runAStar(
   ];
 
   while (openSet.length > 0) {
-    // pick node with smallest fScore
+    // pick the node that looks best
     openSet.sort(
       (a, b) => fScore[a.row][a.col] - fScore[b.row][b.col]
     );
     const current = openSet.shift() as Position;
 
     if (visited[current.row][current.col]) continue;
+
+    // mark node as visited
     visited[current.row][current.col] = true;
-    visitedOrder.push(current);
+    steps.push({ type: "visit", row: current.row, col: current.col });
 
     if (current.row === end.row && current.col === end.col) {
-      break;
+      break; // found it
     }
 
+    // checking neighbors
     for (const dir of directions) {
       const newRow = current.row + dir.row;
       const newCol = current.col + dir.col;
 
       if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) continue;
-      if (grid[newRow][newCol].isWall) continue;
+      if (grid[newRow][newCol].isWall) continue; // skip walls
 
       const tentativeG = gScore[current.row][current.col] + grid[newRow][newCol].weight;
       if (tentativeG < gScore[newRow][newCol]) {
+        // update scores if we found a better path
         gScore[newRow][newCol] = tentativeG;
         fScore[newRow][newCol] =
           tentativeG + manhattan({ row: newRow, col: newCol }, end);
         prev[newRow][newCol] = current;
 
-        // We only add to openSet if it's not already there to optimize performance.
-        // Even if we push duplicates, the visited[] check handles them safely.
+        // add to openSet if it's not already tracking
         if (!openSet.some(node => node.row === newRow && node.col === newCol)) {
           openSet.push({ row: newRow, col: newCol });
         }
@@ -80,6 +85,9 @@ export function runAStar(
     }
   }
 
+  if (prev[end.row][end.col] === null) return steps;
+
+  // backtracking to build final path
   const path: Position[] = [];
   let current: Position | null = end;
 
@@ -95,6 +103,10 @@ export function runAStar(
 
   path.reverse();
 
-  return { visitedOrder, path };
+  for (const pos of path) {
+    steps.push({ type: "path", row: pos.row, col: pos.col });
+  }
+
+  return steps;
 }
 

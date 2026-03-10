@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
-import type { GridNode } from "./types/grid";
+import type { GridNode, AnimationStep } from "./types/grid";
 import { createInitialGrid } from "./utils/grid";
-import { sleep } from "./utils/sleep";
 import { runAlgorithm, type AlgorithmName } from "./algorithms";
 
 function App() {
@@ -144,7 +143,7 @@ function App() {
   };
 
   // Run the selected algorithm and animate the result
-  const handleVisualize = async () => {
+  const handleVisualize = () => {
     // Make sure we have a start and end node
     if (!startNode || !endNode) {
       setStatusText("Please set start and end nodes first");
@@ -166,64 +165,51 @@ function App() {
     setIsAnimating(true);
     setStatusText("Running...");
 
-    try {
-      // Call the correct algorithm based on the user's selection
-      const { visitedOrder, path } = runAlgorithm(
-        selectedAlgorithm,
-        grid,
-        startNode,
-        endNode
-      );
+    // Call the correct algorithm based on the user's selection
+    const steps = runAlgorithm(
+      selectedAlgorithm,
+      grid,
+      startNode,
+      endNode
+    );
 
-      // Convert speed (1-100) to a delay in milliseconds.
-      // Higher slider value = faster animation (smaller delay).
-      const delay = 110 - speed;
+    // Convert speed (1-100) to a delay in milliseconds.
+    // Higher slider value = faster animation (smaller delay).
+    const delay = 110 - speed;
 
-      // Animate nodes as they are visited
-      for (const pos of visitedOrder) {
-        await sleep(delay);
+    const animateStep = (step: AnimationStep) => {
+      setGrid((prevGrid) => {
+        const newGrid = [...prevGrid];
+        const rowArray = [...newGrid[step.row]];
+        const node = { ...rowArray[step.col] };
 
-        setGrid((prevGrid) => {
-          const newGrid = [...prevGrid];
-          const rowArray = [...newGrid[pos.row]];
-          const node = { ...rowArray[pos.col] };
-
-          // Do not change start/end colors
-          if (!node.isStart && !node.isEnd) {
+        // Do not change start/end colors
+        if (!node.isStart && !node.isEnd) {
+          if (step.type === "visit") {
             node.isVisited = true;
-          }
-
-          rowArray[pos.col] = node;
-          newGrid[pos.row] = rowArray;
-          return newGrid;
-        });
-      }
-
-      // Animate the shortest path
-      for (const pos of path) {
-        await sleep(delay);
-
-        setGrid((prevGrid) => {
-          const newGrid = [...prevGrid];
-          const rowArray = [...newGrid[pos.row]];
-          const node = { ...rowArray[pos.col] };
-
-          // Do not change start/end colors
-          if (!node.isStart && !node.isEnd) {
+          } else if (step.type === "path") {
             node.isPath = true;
           }
+        }
 
-          rowArray[pos.col] = node;
-          newGrid[pos.row] = rowArray;
-          return newGrid;
-        });
-      }
+        rowArray[step.col] = node;
+        newGrid[step.row] = rowArray;
+        return newGrid;
+      });
+    };
 
-      setStatusText("Finished");
-    } finally {
-      // Always re-enable controls even if something goes wrong
+    // Schedule all steps
+    steps.forEach((step, index) => {
+      setTimeout(() => {
+        animateStep(step);
+      }, index * delay);
+    });
+
+    // Re-enable interactions after the animation finishes
+    setTimeout(() => {
       setIsAnimating(false);
-    }
+      setStatusText("Finished");
+    }, steps.length * delay);
   };
 
   return (

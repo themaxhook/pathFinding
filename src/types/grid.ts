@@ -18,4 +18,10 @@ export type Position = {
   col: number;
 };
 
+// Represents a single step in the animation sequence
+export type AnimationStep = {
+  type: "visit" | "path";
+  row: number;
+  col: number;
+};
 
